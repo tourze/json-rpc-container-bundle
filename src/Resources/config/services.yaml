@@ -13,3 +13,8 @@ services:
     tags: [ 'container.service_locator' ]
     arguments:
       - [ ] # <-- Will be defined during container compilation
+
+  Tourze\JsonRPCContainerBundle\Service\MethodResolver: ~  # 确保这个类是服务
+  Tourze\JsonRPC\Core\Domain\JsonRpcMethodResolverInterface:
+    alias: Tourze\JsonRPCContainerBundle\Service\MethodResolver
+    public: true
