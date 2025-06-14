@@ -2,9 +2,11 @@
 
 namespace Tourze\JsonRPCContainerBundle\Tests\Integration;
 
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Tourze\JsonRPC\Core\Domain\JsonRpcMethodInterface;
 use Tourze\JsonRPC\Core\Domain\JsonRpcMethodResolverInterface;
+use Tourze\JsonRPCContainerBundle\JsonRPCContainerBundle;
 use Tourze\JsonRPCContainerBundle\Service\MethodResolver;
 
 /**
@@ -14,7 +16,24 @@ class JsonRPCContainerIntegrationTest extends KernelTestCase
 {
     protected static function getKernelClass(): string
     {
-        return IntegrationTestKernel::class;
+        return TestKernel::class;
+    }
+
+    protected static function createKernel(array $options = []): TestKernel
+    {
+        $appendBundles = [
+            FrameworkBundle::class => ['all' => true],
+            JsonRPCContainerBundle::class => ['all' => true],
+        ];
+        
+        $entityMappings = [];
+
+        return new TestKernel(
+            $options['environment'] ?? 'test',
+            $options['debug'] ?? true,
+            $appendBundles,
+            $entityMappings
+        );
     }
 
     protected function setUp(): void
