@@ -263,7 +263,6 @@ class JsonRpcProcedureCompilerPassEdgeCaseTest extends TestCase
         $result = JsonRpcProcedureCompilerPass::findAndValidateJsonRpcMethodDefinition($this->container);
 
         // 验证结果
-        $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
 } 

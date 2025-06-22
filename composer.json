@@ -10,6 +10,7 @@
     "symfony/dependency-injection": "^6.4",
     "symfony/framework-bundle": "^6.4",
     "symfony/http-kernel": "^6.4",
+    "symfony/service-contracts": "^3.5",
     "symfony/yaml": "^6.4 || ^7.1",
     "tourze/json-rpc-core": "0.0.*",
     "tourze/symfony-integration-test-kernel": "0.0.*"

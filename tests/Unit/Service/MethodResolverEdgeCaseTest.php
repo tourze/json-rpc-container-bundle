@@ -3,7 +3,7 @@
 namespace Tourze\JsonRPCContainerBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 use Tourze\JsonRPCContainerBundle\Service\MethodResolver;
 use Tourze\JsonRPCContainerBundle\Tests\Fixtures\TestJsonRpcMethod;
 
@@ -12,12 +12,12 @@ use Tourze\JsonRPCContainerBundle\Tests\Fixtures\TestJsonRpcMethod;
  */
 class MethodResolverEdgeCaseTest extends TestCase
 {
-    private ContainerInterface $locator;
+    private ServiceProviderInterface $locator;
     private MethodResolver $resolver;
 
     protected function setUp(): void
     {
-        $this->locator = $this->createMock(ContainerInterface::class);
+        $this->locator = $this->createMock(ServiceProviderInterface::class);
         $this->resolver = new MethodResolver($this->locator);
     }
 
@@ -221,8 +221,8 @@ class MethodResolverEdgeCaseTest extends TestCase
     public function testGetAllMethodNames_withEmptyLocator_shouldReturnEmptyArray(): void
     {
         // 创建一个空的服务容器
-        $emptyLocator = new class implements ContainerInterface {
-            public function get(string $id)
+        $emptyLocator = new class implements ServiceProviderInterface {
+            public function get(string $id): mixed
             {
                 return null;
             }
@@ -244,7 +244,6 @@ class MethodResolverEdgeCaseTest extends TestCase
         $result = $resolver->getAllMethodNames();
 
         // 验证结果
-        $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
 

@@ -2,8 +2,8 @@
 
 namespace Tourze\JsonRPCContainerBundle\Service;
 
-use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 use Tourze\JsonRPC\Core\Domain\JsonRpcMethodInterface;
 use Tourze\JsonRPC\Core\Domain\JsonRpcMethodResolverInterface;
 
@@ -13,7 +13,7 @@ use Tourze\JsonRPC\Core\Domain\JsonRpcMethodResolverInterface;
 class MethodResolver implements JsonRpcMethodResolverInterface
 {
     public function __construct(
-        #[Autowire(service: 'json_rpc_http_server.service_locator.method_resolver')] private readonly ContainerInterface $locator
+        #[Autowire(service: 'json_rpc_http_server.service_locator.method_resolver')] private readonly ServiceProviderInterface $locator
     ) {
     }
 

@@ -3,7 +3,7 @@
 namespace Tourze\JsonRPCContainerBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 use Tourze\JsonRPC\Core\Domain\JsonRpcMethodInterface;
 use Tourze\JsonRPCContainerBundle\Service\MethodResolver;
 use Tourze\JsonRPCContainerBundle\Tests\Fixtures\TestJsonRpcMethod;
@@ -13,12 +13,12 @@ use Tourze\JsonRPCContainerBundle\Tests\Fixtures\TestJsonRpcMethod;
  */
 class MethodResolverTest extends TestCase
 {
-    private ContainerInterface $locator;
+    private ServiceProviderInterface $locator;
     private MethodResolver $resolver;
 
     protected function setUp(): void
     {
-        $this->locator = $this->createMock(ContainerInterface::class);
+        $this->locator = $this->createMock(ServiceProviderInterface::class);
         $this->resolver = new MethodResolver($this->locator);
     }
 
@@ -120,7 +120,7 @@ class MethodResolverTest extends TestCase
         }
 
         // 创建一个使用数组实现的服务容器，而不是模拟的ContainerInterface
-        $locator = new class($providedServices) implements ContainerInterface {
+        $locator = new class($providedServices) implements ServiceProviderInterface {
             private array $services;
 
             public function __construct(array $services)
@@ -128,7 +128,7 @@ class MethodResolverTest extends TestCase
                 $this->services = $services;
             }
 
-            public function get(string $id)
+            public function get(string $id): mixed
             {
                 return $this->services[$id] ?? null;
             }
@@ -150,7 +150,6 @@ class MethodResolverTest extends TestCase
         $result = $resolver->getAllMethodNames();
 
         // 验证结果
-        $this->assertIsArray($result);
         $this->assertCount(count($methodNames), $result);
         $this->assertEquals($methodNames, $result);
     }

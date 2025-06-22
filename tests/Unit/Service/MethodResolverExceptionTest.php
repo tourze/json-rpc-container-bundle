@@ -4,8 +4,8 @@ namespace Tourze\JsonRPCContainerBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 use Tourze\JsonRPCContainerBundle\Service\MethodResolver;
 
 /**
@@ -21,7 +21,7 @@ class MethodResolverExceptionTest extends TestCase
         $methodName = 'test.method';
 
         // 创建一个会抛出容器异常的模拟定位器
-        $locator = $this->createMock(ContainerInterface::class);
+        $locator = $this->createMock(ServiceProviderInterface::class);
         $locator->expects($this->once())
             ->method('has')
             ->with($methodName)
@@ -47,7 +47,7 @@ class MethodResolverExceptionTest extends TestCase
         $methodName = 'test.method';
 
         // 创建一个会抛出NotFound异常的模拟定位器
-        $locator = $this->createMock(ContainerInterface::class);
+        $locator = $this->createMock(ServiceProviderInterface::class);
         $locator->expects($this->once())
             ->method('has')
             ->with($methodName)
@@ -73,7 +73,7 @@ class MethodResolverExceptionTest extends TestCase
         $methodName = 'test.method';
 
         // 创建一个has方法会抛出异常的模拟定位器
-        $locator = $this->createMock(ContainerInterface::class);
+        $locator = $this->createMock(ServiceProviderInterface::class);
         $locator->expects($this->once())
             ->method('has')
             ->with($methodName)
@@ -88,38 +88,13 @@ class MethodResolverExceptionTest extends TestCase
     }
 
     /**
-     * 测试当getProvidedServices方法不存在时的处理
-     */
-    public function testGetAllMethodNames_whenLocatorDoesNotHaveGetProvidedServices_shouldThrowError(): void
-    {
-        // 创建一个标准的ContainerInterface实现，不包含getProvidedServices方法
-        $locator = new class implements ContainerInterface {
-            public function get(string $id)
-            {
-                return null;
-            }
-
-            public function has(string $id): bool
-            {
-                return false;
-            }
-        };
-
-        $resolver = new MethodResolver($locator);
-
-        // 期望抛出Error或BadMethodCallException
-        $this->expectException(\Error::class);
-        $resolver->getAllMethodNames();
-    }
-
-    /**
      * 测试当getProvidedServices返回非数组时的处理
      */
     public function testGetAllMethodNames_whenGetProvidedServicesReturnsNonArray_shouldHandleGracefully(): void
     {
         // 创建一个getProvidedServices返回非数组的容器
-        $locator = new class implements ContainerInterface {
-            public function get(string $id)
+        $locator = new class implements ServiceProviderInterface {
+            public function get(string $id): mixed
             {
                 return null;
             }
@@ -129,8 +104,9 @@ class MethodResolverExceptionTest extends TestCase
                 return false;
             }
 
-            public function getProvidedServices()
+            public function getProvidedServices(): array
             {
+                // @phpstan-ignore-next-line
                 return 'not an array';
             }
         };
@@ -148,8 +124,8 @@ class MethodResolverExceptionTest extends TestCase
     public function testGetAllMethodNames_whenGetProvidedServicesReturnsNull_shouldHandleGracefully(): void
     {
         // 创建一个getProvidedServices返回null的容器
-        $locator = new class implements ContainerInterface {
-            public function get(string $id)
+        $locator = new class implements ServiceProviderInterface {
+            public function get(string $id): mixed
             {
                 return null;
             }
@@ -159,8 +135,9 @@ class MethodResolverExceptionTest extends TestCase
                 return false;
             }
 
-            public function getProvidedServices()
+            public function getProvidedServices(): array
             {
+                // @phpstan-ignore-next-line
                 return null;
             }
         };
@@ -183,7 +160,7 @@ class MethodResolverExceptionTest extends TestCase
         unset($_ENV["JSON_RPC_METHOD_REMAP_{$methodName}"]);
 
         // 创建模拟定位器
-        $locator = $this->createMock(ContainerInterface::class);
+        $locator = $this->createMock(ServiceProviderInterface::class);
         $locator->expects($this->once())
             ->method('has')
             ->with($methodName) // 应该使用原始方法名，不进行重映射

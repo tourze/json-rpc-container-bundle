@@ -139,7 +139,6 @@ class JsonRpcProcedureCompilerPassTest extends TestCase
         $result = JsonRpcProcedureCompilerPass::findAndValidateJsonRpcMethodDefinition($this->container);
 
         // 验证结果
-        $this->assertIsArray($result);
         $this->assertArrayHasKey($serviceId1, $result);
         $this->assertArrayHasKey($serviceId2, $result);
         $this->assertContains($methodName1, $result[$serviceId1]);

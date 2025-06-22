@@ -107,7 +107,6 @@ class JsonRPCContainerIntegrationTest extends KernelTestCase
         $methodNames = $resolver->getAllMethodNames();
 
         // 验证结果
-        $this->assertIsArray($methodNames);
         $this->assertContains('test.method', $methodNames);
     }
 }
