@@ -109,39 +109,4 @@ class JsonRpcProcedureCompilerPassTest extends TestCase
         $this->assertNull($validateMethod->invokeArgs(null, ['test.service', $validDef]));
     }
 
-    /**
-     * 测试findAndValidateJsonRpcMethodDefinition方法
-     */
-    public function testFindAndValidateJsonRpcMethodDefinition_withTaggedServices_shouldReturnMappings(): void
-    {
-        // 准备测试数据
-        $methodName1 = 'test.method1';
-        $serviceId1 = 'test.service1';
-        $methodName2 = 'test.method2';
-        $serviceId2 = 'test.service2';
-
-        // 创建测试服务定义
-        $serviceDefinition1 = new Definition(TestJsonRpcMethod::class);
-        $serviceDefinition1->addTag(MethodExpose::JSONRPC_METHOD_TAG, [
-            JsonRpcProcedureCompilerPass::JSONRPC_METHOD_TAG_METHOD_NAME_KEY => $methodName1
-        ]);
-
-        $serviceDefinition2 = new Definition(TestJsonRpcMethod::class);
-        $serviceDefinition2->addTag(MethodExpose::JSONRPC_METHOD_TAG, [
-            JsonRpcProcedureCompilerPass::JSONRPC_METHOD_TAG_METHOD_NAME_KEY => $methodName2
-        ]);
-
-        // 添加到容器
-        $this->container->setDefinition($serviceId1, $serviceDefinition1);
-        $this->container->setDefinition($serviceId2, $serviceDefinition2);
-
-        // 调用方法
-        $result = JsonRpcProcedureCompilerPass::findAndValidateJsonRpcMethodDefinition($this->container);
-
-        // 验证结果
-        $this->assertArrayHasKey($serviceId1, $result);
-        $this->assertArrayHasKey($serviceId2, $result);
-        $this->assertContains($methodName1, $result[$serviceId1]);
-        $this->assertContains($methodName2, $result[$serviceId2]);
-    }
 }

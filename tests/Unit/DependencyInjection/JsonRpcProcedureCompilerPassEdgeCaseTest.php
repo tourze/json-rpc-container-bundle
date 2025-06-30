@@ -254,15 +254,4 @@ class JsonRpcProcedureCompilerPassEdgeCaseTest extends TestCase
         $this->assertEquals($serviceId, (string)$methodMapping[$methodName]);
     }
 
-    /**
-     * 测试findAndValidateJsonRpcMethodDefinition方法 - 空容器
-     */
-    public function testFindAndValidateJsonRpcMethodDefinition_withEmptyContainer_shouldReturnEmptyArray(): void
-    {
-        // 调用方法
-        $result = JsonRpcProcedureCompilerPass::findAndValidateJsonRpcMethodDefinition($this->container);
-
-        // 验证结果
-        $this->assertEmpty($result);
-    }
 } 

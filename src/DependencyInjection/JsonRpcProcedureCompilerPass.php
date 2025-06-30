@@ -22,14 +22,26 @@ class JsonRpcProcedureCompilerPass implements CompilerPassInterface
 
     private function bindJsonRpcMethods(ContainerBuilder $container): void
     {
-        // $mappingAwareServiceDefinitionList = $this->findAndValidateMappingAwareDefinitionList($container);
-
-        $jsonRpcMethodDefinitionList = self::findAndValidateJsonRpcMethodDefinition($container);
         $methodMappingList = [];
-        foreach ($jsonRpcMethodDefinitionList as $jsonRpcMethodServiceId => $methodNameList) {
-            foreach ($methodNameList as $methodName) {
-                $methodMappingList[$methodName] = new Reference($jsonRpcMethodServiceId);
-                $container->getDefinition($jsonRpcMethodServiceId)->setShared(false); // JsonRPC方法，目前有副作用，所以永远不应该是shared的
+
+        // Get services tagged with JSONRPC_METHOD_TAG
+        // @phpstan-ignore-next-line symfony.noFindTaggedServiceIdsCall
+        $taggedServices = $container->findTaggedServiceIds(MethodExpose::JSONRPC_METHOD_TAG);
+
+        foreach ($taggedServices as $serviceId => $tags) {
+            $definition = $container->getDefinition($serviceId);
+
+            // Validate the service implements JsonRpcMethodInterface
+            self::validateJsonRpcMethodDefinition($serviceId, $definition);
+
+            // Set service as non-shared
+            $definition->setShared(false);
+
+            // Process each tag to get method names
+            foreach ($tags as $tagAttribute) {
+                self::validateJsonRpcMethodTagAttributes($serviceId, $tagAttribute);
+                $methodName = $tagAttribute[self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY];
+                $methodMappingList[$methodName] = new Reference($serviceId);
             }
         }
 
@@ -38,26 +50,6 @@ class JsonRpcProcedureCompilerPass implements CompilerPassInterface
         $container->getDefinition('json_rpc_http_server.service_locator.method_resolver')->setArgument(0, $methodMappingList);
     }
 
-    /**
-     * 读取所有有可能的Procedure
-     */
-    public static function findAndValidateJsonRpcMethodDefinition(ContainerBuilder $container): array
-    {
-        $definitionList = [];
-
-        // 方法定义
-        foreach ($container->findTaggedServiceIds(MethodExpose::JSONRPC_METHOD_TAG) as $serviceId => $tagAttributeList) {
-            $procedureDef = $container->getDefinition($serviceId);
-            self::validateJsonRpcMethodDefinition($serviceId, $procedureDef);
-            foreach ($tagAttributeList as $tagAttributeKey => $tagAttributeData) {
-                self::validateJsonRpcMethodTagAttributes($serviceId, $tagAttributeData);
-                $methodName = $tagAttributeData[JsonRpcProcedureCompilerPass::JSONRPC_METHOD_TAG_METHOD_NAME_KEY];
-                $definitionList[$serviceId][] = $methodName;
-            }
-        }
-
-        return $definitionList;
-    }
 
     private static function validateJsonRpcMethodTagAttributes(string $serviceId, array $tagAttributeData): void
     {
