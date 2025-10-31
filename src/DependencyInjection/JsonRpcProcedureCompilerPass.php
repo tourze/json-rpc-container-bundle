@@ -50,7 +50,9 @@ class JsonRpcProcedureCompilerPass implements CompilerPassInterface
         $container->getDefinition('json_rpc_http_server.service_locator.method_resolver')->setArgument(0, $methodMappingList);
     }
 
-
+    /**
+     * @param array<string, mixed> $tagAttributeData
+     */
     private static function validateJsonRpcMethodTagAttributes(string $serviceId, array $tagAttributeData): void
     {
         if (!isset($tagAttributeData[JsonRpcProcedureCompilerPass::JSONRPC_METHOD_TAG_METHOD_NAME_KEY])) {
@@ -63,7 +65,13 @@ class JsonRpcProcedureCompilerPass implements CompilerPassInterface
      */
     private static function validateJsonRpcMethodDefinition(string $serviceId, Definition $definition): void
     {
-        if (!in_array(JsonRpcMethodInterface::class, class_implements($definition->getClass()))) {
+        $className = $definition->getClass();
+        if (null === $className) {
+            throw new LogicException(sprintf('Service "%s" has no class defined', $serviceId));
+        }
+
+        $interfaces = class_implements($className);
+        if (false === $interfaces || !in_array(JsonRpcMethodInterface::class, $interfaces, true)) {
             throw new LogicException(sprintf('Service "%s" is taggued as JSON-RPC method but does not implement %s', $serviceId, JsonRpcMethodInterface::class));
         }
     }

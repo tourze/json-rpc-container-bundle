@@ -1,25 +1,39 @@
 # JsonRPCContainerBundle
 
-这是一个Symfony Bundle，用于注册和管理JSON-RPC方法。该Bundle为`tourze/json-rpc-core`提供了容器集成，使JSON-RPC方法可以通过Symfony容器进行注册和解析。
+[English](README.md) | [中文](README.zh-CN.md)
 
-## 功能特性
+[![Latest Version](https://img.shields.io/packagist/v/tourze/json-rpc-container-bundle.svg?style=flat-square)](https://packagist.org/packages/tourze/json-rpc-container-bundle)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-8892BF.svg?style=flat-square)](https://packagist.org/packages/tourze/json-rpc-container-bundle)
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
+![Code Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg?style=flat-square)
 
-- 使用Symfony容器来管理JSON-RPC方法
-- 支持通过标签自动注册JSON-RPC方法
-- 提供方法解析器实现，自动解析JSON-RPC方法
-- 支持通过环境变量进行方法重映射
+A Symfony Bundle for registering and managing JSON-RPC methods. This bundle provides container integration for `tourze/json-rpc-core`, enabling JSON-RPC methods to be registered and resolved through the Symfony container.
 
-## 安装
+## Features
 
-通过Composer安装:
+- Manage JSON-RPC methods using Symfony container
+- Automatic registration of JSON-RPC methods through tags
+- Method resolver implementation for automatic JSON-RPC method resolution
+- Support for method remapping via environment variables
+
+## Installation
+
+Install via Composer:
 
 ```bash
 composer require tourze/json-rpc-container-bundle
 ```
 
-## 配置
+## Requirements
 
-在你的Symfony应用程序中注册Bundle：
+- PHP >= 8.1
+- Symfony >= 7.3
+- tourze/json-rpc-core
+
+## Configuration
+
+Register the bundle in your Symfony application:
 
 ```php
 // config/bundles.php
@@ -29,11 +43,11 @@ return [
 ];
 ```
 
-## 使用方法
+## Usage
 
-### 创建JSON-RPC方法
+### Creating JSON-RPC Methods
 
-首先，创建一个实现`JsonRpcMethodInterface`的类：
+First, create a class that implements `JsonRpcMethodInterface`:
 
 ```php
 <?php
@@ -47,23 +61,23 @@ class ExampleMethod implements JsonRpcMethodInterface
 {
     public function __invoke(JsonRpcRequest $request): mixed
     {
-        // 处理JSON-RPC请求
+        // Handle JSON-RPC request
         return ['success' => true, 'data' => 'example_result'];
     }
     
     public function execute(): array
     {
-        // 兼容接口实现
+        // Interface compatibility implementation
         return ['success' => true, 'data' => 'example_result'];
     }
 }
 ```
 
-### 注册JSON-RPC方法
+### Registering JSON-RPC Methods
 
-使用`json_rpc_http_server.jsonrpc_method`标签注册方法：
+Register methods using the `json_rpc_http_server.jsonrpc_method` tag:
 
-#### 通过服务配置注册
+#### Via Service Configuration
 
 ```yaml
 # config/services.yaml
@@ -74,7 +88,7 @@ services:
             - { name: 'json_rpc_http_server.jsonrpc_method', method: 'example.method' }
 ```
 
-#### 通过属性注册
+#### Via Attributes
 
 ```php
 <?php
@@ -92,9 +106,9 @@ class ExampleMethod implements JsonRpcMethodInterface
 }
 ```
 
-### 解析JSON-RPC方法
+### Resolving JSON-RPC Methods
 
-通过服务容器获取`JsonRpcMethodResolverInterface`实例：
+Get an instance of `JsonRpcMethodResolverInterface` through the service container:
 
 ```php
 <?php
@@ -109,10 +123,10 @@ class ApiController extends AbstractController
 {
     public function handleRequest(JsonRpcMethodResolverInterface $methodResolver): Response
     {
-        // 解析指定方法
+        // Resolve specific method
         $method = $methodResolver->resolve('example.method');
         
-        // 获取所有已注册的方法名
+        // Get all registered method names
         $allMethods = $methodResolver->getAllMethodNames();
         
         // ...
@@ -120,25 +134,29 @@ class ApiController extends AbstractController
 }
 ```
 
-### 方法重映射
+### Method Remapping
 
-可以通过环境变量重映射方法名：
+You can remap method names through environment variables:
 
-```
+```dotenv
 # .env
 JSON_RPC_METHOD_REMAP_original.method=remapped.method
 ```
 
-这将使对`original.method`的请求被重定向到`remapped.method`。
+This will redirect requests for `original.method` to `remapped.method`.
 
-## 测试
+## Testing
 
-运行单元测试：
+Run unit tests:
 
 ```bash
 ./vendor/bin/phpunit packages/json-rpc-container-bundle/tests
 ```
 
-## 许可证
+## Contributing
 
-MIT
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.

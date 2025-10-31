@@ -1,29 +1,36 @@
 <?php
 
-namespace Tourze\JsonRPCContainerBundle\Tests\Unit\DependencyInjection;
+namespace Tourze\JsonRPCContainerBundle\Tests\DependencyInjection;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Tourze\JsonRPCContainerBundle\DependencyInjection\JsonRPCContainerExtension;
+use Tourze\PHPUnitSymfonyUnitTest\AbstractDependencyInjectionExtensionTestCase;
 
 /**
  * JsonRPCContainerExtension单元测试
+ *
+ * @internal
  */
-class JsonRPCContainerExtensionTest extends TestCase
+#[CoversClass(JsonRPCContainerExtension::class)]
+final class JsonRPCContainerExtensionTest extends AbstractDependencyInjectionExtensionTestCase
 {
     private JsonRPCContainerExtension $extension;
+
     private ContainerBuilder $container;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->extension = new JsonRPCContainerExtension();
         $this->container = new ContainerBuilder();
+        $this->container->setParameter('kernel.environment', 'test');
     }
 
     /**
      * 测试load方法是否正确加载服务配置
      */
-    public function testLoad_shouldLoadServices(): void
+    public function testLoadShouldLoadServices(): void
     {
         // 调用load方法
         $this->extension->load([], $this->container);
@@ -43,7 +50,7 @@ class JsonRPCContainerExtensionTest extends TestCase
     /**
      * 测试load方法使用不同的配置参数
      */
-    public function testLoad_withDifferentConfigs_shouldLoadCorrectly(): void
+    public function testLoadWithDifferentConfigsShouldLoadCorrectly(): void
     {
         $configs = [
             ['some_config' => 'value1'],
@@ -61,7 +68,7 @@ class JsonRPCContainerExtensionTest extends TestCase
     /**
      * 测试load方法使用空配置数组
      */
-    public function testLoad_withEmptyConfigs_shouldLoadCorrectly(): void
+    public function testLoadWithEmptyConfigsShouldLoadCorrectly(): void
     {
         // 调用load方法
         $this->extension->load([], $this->container);
@@ -75,7 +82,7 @@ class JsonRPCContainerExtensionTest extends TestCase
     /**
      * 测试多次调用load方法
      */
-    public function testLoad_calledMultipleTimes_shouldNotCreateDuplicates(): void
+    public function testLoadCalledMultipleTimesShouldNotCreateDuplicates(): void
     {
         // 第一次调用
         $this->extension->load([], $this->container);
@@ -96,7 +103,7 @@ class JsonRPCContainerExtensionTest extends TestCase
     /**
      * 测试加载的服务定位器定义的正确性
      */
-    public function testLoad_serviceLocatorDefinition_shouldHaveCorrectConfiguration(): void
+    public function testLoadServiceLocatorDefinitionShouldHaveCorrectConfiguration(): void
     {
         // 调用load方法
         $this->extension->load([], $this->container);
@@ -120,7 +127,7 @@ class JsonRPCContainerExtensionTest extends TestCase
     /**
      * 测试方法解析器别名的正确性
      */
-    public function testLoad_methodResolverAlias_shouldHaveCorrectConfiguration(): void
+    public function testLoadMethodResolverAliasShouldHaveCorrectConfiguration(): void
     {
         // 调用load方法
         $this->extension->load([], $this->container);
@@ -129,7 +136,7 @@ class JsonRPCContainerExtensionTest extends TestCase
         $alias = $this->container->getAlias('Tourze\JsonRPC\Core\Domain\JsonRpcMethodResolverInterface');
 
         // 验证别名指向正确的服务
-        $this->assertEquals('Tourze\JsonRPCContainerBundle\Service\MethodResolver', (string)$alias);
+        $this->assertEquals('Tourze\JsonRPCContainerBundle\Service\MethodResolver', (string) $alias);
 
         // 验证别名是公开的
         $this->assertTrue($alias->isPublic());
