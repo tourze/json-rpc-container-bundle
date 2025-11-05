@@ -25,7 +25,6 @@ class JsonRpcProcedureCompilerPass implements CompilerPassInterface
         $methodMappingList = [];
 
         // Get services tagged with JSONRPC_METHOD_TAG
-        // @phpstan-ignore-next-line symfony.noFindTaggedServiceIdsCall
         $taggedServices = $container->findTaggedServiceIds(MethodExpose::JSONRPC_METHOD_TAG);
 
         foreach ($taggedServices as $serviceId => $tags) {
