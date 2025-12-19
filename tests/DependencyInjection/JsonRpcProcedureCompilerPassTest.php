@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPCContainerBundle\DependencyInjection\JsonRpcProcedureCompilerPass;
 use Tourze\JsonRPCContainerBundle\Tests\Fixtures\TestJsonRpcMethod;
+use Tourze\JsonRPCContainerBundle\Tests\Fixtures\TestJsonRpcMethodWithoutParamDoc;
 
 /**
  * JsonRpcProcedureCompilerPass单元测试
@@ -65,9 +66,37 @@ final class JsonRpcProcedureCompilerPassTest extends TestCase
         $this->assertInstanceOf(Reference::class, $methodMapping[$methodName]);
         $this->assertEquals($serviceId, (string) $methodMapping[$methodName]);
 
-        // 验证服务不是共享的
+        // 默认服务应保持共享（不再被 CompilerPass 强制设为非共享）
         $serviceDef = $this->container->getDefinition($serviceId);
-        $this->assertFalse($serviceDef->isShared());
+        $this->assertTrue($serviceDef->isShared());
+    }
+
+    /**
+     * 测试 process 方法处理流程 - 缺少 execute 参数 PHPDoc 注释时抛出异常
+     */
+    public function testProcessWithMissingExecuteParamPhpDocShouldThrowException(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Procedure "%s" execute() must declare "@phpstan-param %s $%s"',
+            TestJsonRpcMethodWithoutParamDoc::class,
+            'TestJsonRpcMethodParam',
+            'param',
+        ));
+
+        $methodName = 'test.method';
+        $serviceId = 'test.service';
+
+        $serviceDefinition = new Definition(TestJsonRpcMethodWithoutParamDoc::class);
+        $serviceDefinition->addTag(MethodExpose::JSONRPC_METHOD_TAG, [
+            JsonRpcProcedureCompilerPass::JSONRPC_METHOD_TAG_METHOD_NAME_KEY => $methodName,
+        ]);
+        $this->container->setDefinition($serviceId, $serviceDefinition);
+
+        $serviceLocatorDef = new Definition('Symfony\\Component\\DependencyInjection\\ServiceLocator');
+        $this->container->setDefinition('json_rpc_http_server.service_locator.method_resolver', $serviceLocatorDef);
+
+        $this->compilerPass->process($this->container);
     }
 
     /**

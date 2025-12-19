@@ -4,7 +4,7 @@ namespace Tourze\JsonRPCContainerBundle\DependencyInjection;
 
 use Tourze\SymfonyDependencyServiceLoader\AutoExtension;
 
-class JsonRPCContainerExtension extends AutoExtension
+final class JsonRPCContainerExtension extends AutoExtension
 {
     protected function getConfigDir(): string
     {

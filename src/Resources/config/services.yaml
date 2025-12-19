@@ -1,20 +1,28 @@
 services:
-  # default configuration for services in *this* file
   _defaults:
-    autowire: true      # Automatically injects dependencies in your services.
-    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    autowire: true
+    autoconfigure: true
 
-#  Tourze\JsonRPCContainerBundle\Service\:
-#    resource: '../../Service/'
+  Tourze\JsonRPCContainerBundle\Service\:
+    resource: '../../Service/'
+    public: true
 
-  # 下面这个容器，主要是用来优化JsonRPC方法查找逻辑，别删除
+  # ServiceLocator for JsonRPC method resolution, populated by CompilerPass
   json_rpc_http_server.service_locator.method_resolver:
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: [ 'container.service_locator' ]
     arguments:
-      - [ ] # <-- Will be defined during container compilation
+      - []
 
-  Tourze\JsonRPCContainerBundle\Service\MethodResolver: ~  # 确保这个类是服务
   Tourze\JsonRPC\Core\Domain\JsonRpcMethodResolverInterface:
     alias: Tourze\JsonRPCContainerBundle\Service\MethodResolver
+    public: true
+
+  # Procedure -> Param mapping registry, populated by CompilerPass
+  Tourze\JsonRPCContainerBundle\Service\ProcedureParamRegistry:
+    arguments:
+      - []
+
+  Tourze\JsonRPC\Core\Contracts\ProcedureParamRegistryInterface:
+    alias: Tourze\JsonRPCContainerBundle\Service\ProcedureParamRegistry
     public: true

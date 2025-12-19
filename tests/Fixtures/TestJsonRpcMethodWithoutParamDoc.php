@@ -8,18 +8,16 @@ use Tourze\JsonRPC\Core\Domain\JsonRpcMethodInterface;
 use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
 use Tourze\JsonRPC\Core\Result\ArrayResult;
 
-final class TestJsonRpcMethod implements JsonRpcMethodInterface
+final class TestJsonRpcMethodWithoutParamDoc implements JsonRpcMethodInterface
 {
     public function __invoke(JsonRpcRequest $request): RpcResultInterface
     {
         return new ArrayResult(['test' => 'result']);
     }
 
-    /**
-     * @phpstan-param TestJsonRpcMethodParam $param
-     */
     public function execute(TestJsonRpcMethodParam|RpcParamInterface $param): RpcResultInterface
     {
         return new ArrayResult(['test' => 'result']);
     }
 }
+
